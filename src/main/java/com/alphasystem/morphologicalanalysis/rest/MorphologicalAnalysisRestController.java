@@ -17,8 +17,8 @@ import java.util.List;
  * @author sali
  */
 @RestController
-@RequestMapping("/mongo")
-public class MonoRestController {
+@RequestMapping("/morphological")
+public class MorphologicalAnalysisRestController {
 
     @Autowired private MorphologicalAnalysisRepositoryUtil repositoryUtil;
     @Autowired private ChapterRepository chapterRepository;
