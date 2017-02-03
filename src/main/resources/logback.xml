@@ -56,4 +56,34 @@
     <logger name="org.springframework.beans.factory.annotation" level="WARN"/>
     <logger name="org.springframework.test.context.support" level="INFO"/>
     <logger name="org.springframework.aop.framework" level="INFO"/>
+    <logger name="org.springframework.web.servlet.mvc.method.annotation" level="WARN"/>
+    <logger name="org.apache.tomcat.util.modeler.modules" level="INFO"/>
+    <logger name="org.apache.tomcat.util.digester" level="INFO"/>
+    <logger name="org.apache.tomcat.util" level="INFO"/>
+    <logger name="org.springframework.web.servlet.handler" level="INFO"/>
+    <logger name="org.apache.catalina.loader" level="INFO"/>
+    <logger name="org.apache.catalina.loader" level="INFO"/>
+    <logger name="org.springframework.web.context.support" level="INFO"/>
+    <logger name="org.springframework.boot.autoconfigure.logging" level="INFO"/>
+    <logger name="org.mongodb.driver.protocol.command" level="INFO"/>
+    <logger name="org.mongodb.driver.cluster" level="INFO"/>
+    <logger name="org.apache.catalina.util" level="INFO"/>
+    <logger name="org.hibernate.validator.internal.engine" level="INFO"/>
+    <logger name="org.apache.catalina.core" level="INFO"/>
+    <logger name="org.springframework.boot.context.embedded.tomcat" level="INFO"/>
+    <logger name="org.springframework.boot.web.servlet" level="INFO"/>
+    <logger name="org.hibernate.validator.internal.xml" level="INFO"/>
+    <logger name="org.springframework.boot.web.filter" level="INFO"/>
+    <logger name="org.springframework.web.servlet.resource" level="INFO"/>
+    <logger name="org.springframework.jmx.export.annotation" level="INFO"/>
+    <logger name="org.apache.catalina.mapper" level="INFO"/>
+    <logger name="org.springframework.jmx.support" level="INFO"/>
+    <logger name="org.apache.catalina.session" level="INFO"/>
+    <logger name="org.springframework.boot.context.embedded" level="INFO"/>
+    <logger name="org.springframework.boot.context.config" level="INFO"/>
+    <logger name="org.jboss.logging" level="INFO"/>
+    <logger name="org.springframework.boot" level="INFO"/>
+    <logger name="org.springframework.test.context" level="INFO"/>
+    <logger name="org.apache.catalina.authenticator" level="INFO"/>
+    <logger name="org.springframework.web.context" level="INFO"/>
 </configuration>
