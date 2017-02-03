@@ -1,0 +1,59 @@
+<configuration>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- use the previously created timestamp to create a uniquely
+             named log file -->
+        <file>build/morphological-analysis.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>morphological-analysis.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>25MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="error">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <root level="warn">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="com.alphasystem.persistence.mongo.spring.support" level="INFO"/>
+    <logger name="com.alphasystem.morphologicalanalysis.wordbyword.listener" level="INFO"/>
+    <logger name="org.springframework.data.mongodb.core" level="INFO"/>
+    <logger name="org.springframework.beans.factory.support" level="INFO"/>
+    <logger name="org.springframework.test.context" level="INFO"/>
+    <logger name="org.springframework.context" level="INFO"/>
+    <logger name="org.springframework.core" level="INFO"/>
+    <logger name="org.springframework.data.repository.config" level="INFO"/>
+    <logger name="org.springframework.beans.factory.annotation" level="WARN"/>
+    <logger name="org.springframework.test.context.support" level="INFO"/>
+    <logger name="org.springframework.aop.framework" level="INFO"/>
+</configuration>
