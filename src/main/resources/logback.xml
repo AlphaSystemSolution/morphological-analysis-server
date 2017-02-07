@@ -6,7 +6,7 @@
         <file>build/morphological-analysis.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <fileNamePattern>morphological-analysis.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>build/morphological-analysis.%d{yyyy-MM-dd}.log</fileNamePattern>
 
             <!-- keep 30 days' worth of history capped at 3GB total size -->
             <maxHistory>30</maxHistory>
@@ -86,4 +86,6 @@
     <logger name="org.springframework.test.context" level="INFO"/>
     <logger name="org.apache.catalina.authenticator" level="INFO"/>
     <logger name="org.springframework.web.context" level="INFO"/>
+    <logger name="org.springframework.data.mongodb.repository.query" level="INFO"/>
+    <logger name="org.mongodb.driver.protocol.update" level="INFO"/>
 </configuration>

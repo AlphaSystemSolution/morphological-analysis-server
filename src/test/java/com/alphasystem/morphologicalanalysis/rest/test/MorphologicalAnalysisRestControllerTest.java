@@ -4,7 +4,6 @@ import com.alphasystem.morphologicalanalysis.MorphologicalAnalysisApplication;
 import com.alphasystem.morphologicalanalysis.util.DataInitializationTool;
 import com.alphasystem.morphologicalanalysis.util.Script;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
@@ -76,7 +76,7 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
                 .filter(hmc -> hmc instanceof MappingJackson2HttpMessageConverter)
                 .findAny()
                 .orElse(null);
-        Assert.assertNotNull("the JSON message converter must not be null", this.mappingJackson2HttpMessageConverter);
+        Assert.assertNotNull(this.mappingJackson2HttpMessageConverter, "the JSON message converter must not be null");
     }
 
     @Test
