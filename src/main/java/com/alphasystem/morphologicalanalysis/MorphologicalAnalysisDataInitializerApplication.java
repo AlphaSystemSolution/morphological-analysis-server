@@ -5,12 +5,11 @@ import com.alphasystem.morphologicalanalysis.util.Script;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author sali
  */
-@SpringBootApplication
+// @SpringBootApplication
 public class MorphologicalAnalysisDataInitializerApplication implements CommandLineRunner {
 
     @Autowired private DataInitializationTool dataInitializationTool;
