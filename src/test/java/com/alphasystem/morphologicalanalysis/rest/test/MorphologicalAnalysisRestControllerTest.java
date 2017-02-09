@@ -1,6 +1,8 @@
 package com.alphasystem.morphologicalanalysis.rest.test;
 
 import com.alphasystem.morphologicalanalysis.MorphologicalAnalysisApplication;
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.util.DataInitializationTool;
 import com.alphasystem.morphologicalanalysis.util.Script;
 import org.hamcrest.Matchers;
@@ -87,6 +89,28 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
                 .andExpect(jsonPath("$", Matchers.hasSize(totalNumberOfChapters)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo("chapter:1")))
                 .andExpect(jsonPath("$[0].displayName", Matchers.equalTo("chapter:1")));
+    }
+
+    @Test(dependsOnMethods = "findAllChapters")
+    public void getTokens() throws Exception {
+        VerseTokenPairGroup group = new VerseTokenPairGroup();
+        group.setChapterNumber(1);
+        group.getPairs().add(new VerseTokensPair(1));
+        group.getPairs().add(new VerseTokensPair(2));
+        group.getPairs().add(new VerseTokensPair(3));
+        group.getPairs().add(new VerseTokensPair(4));
+        mockMvc.perform(MockMvcRequestBuilders.get("/morphological/tokens").contentType(contentType).content(json(group)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(13)));
+    }
+
+    @Test(dependsOnMethods = "getTokens")
+    public void getAllTokens() throws Exception {
+        VerseTokenPairGroup group = new VerseTokenPairGroup();
+        group.setChapterNumber(1);
+        mockMvc.perform(MockMvcRequestBuilders.get("/morphological/tokens").contentType(contentType).content(json(group)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(29)));
     }
 
     @SuppressWarnings("unchecked")
