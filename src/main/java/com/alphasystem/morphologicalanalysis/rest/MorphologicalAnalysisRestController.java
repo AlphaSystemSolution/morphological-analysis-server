@@ -6,6 +6,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ public class MorphologicalAnalysisRestController {
     @Autowired private MorphologicalAnalysisRepositoryUtil repositoryUtil;
     @Autowired private ChapterRepository chapterRepository;
     @Autowired private VerseRepository verseRepository;
+    @Autowired private TokenRepository tokenRepository;
 
     @RequestMapping(value = "/chapters", method = RequestMethod.GET)
     public List<Chapter> findAllChapters() {
@@ -48,6 +50,18 @@ public class MorphologicalAnalysisRestController {
                                       @PathVariable(name = "verseNumberFrom") int verseNumberFrom,
                                       @PathVariable(name = "verseNumberTo") int verseNumberTo) {
         return verseRepository.findByChapterNumberAndVerseNumberBetween(chapterNumber, verseNumberFrom - 1, verseNumberTo);
+    }
+
+    @RequestMapping(value = "/chapter/{chapterNumber}/verse/{verseNumber}/token/{tokenNumber}", method = RequestMethod.GET)
+    public Token getToken(@PathVariable(name = "chapterNumber") int chapterNumber,
+                          @PathVariable(name = "verseNumber") int verseNumber,
+                          @PathVariable(name = "tokenNumber") int tokenNumber) {
+        return tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(chapterNumber, verseNumber, tokenNumber);
+    }
+
+    @RequestMapping(value = "/chapter/{chapterNumber}/verse/{verseNumber}/token/{tokenNumber}", method = RequestMethod.POST)
+    public Token saveToken(@RequestBody Token token) {
+        return tokenRepository.save(token);
     }
 
     @RequestMapping(value = "/tokens", method = RequestMethod.GET)

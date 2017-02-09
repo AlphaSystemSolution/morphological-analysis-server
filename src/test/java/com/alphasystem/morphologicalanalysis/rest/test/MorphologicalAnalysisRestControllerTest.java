@@ -1,10 +1,21 @@
 package com.alphasystem.morphologicalanalysis.rest.test;
 
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.MorphologicalAnalysisApplication;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.util.DataInitializationTool;
 import com.alphasystem.morphologicalanalysis.util.Script;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.ParticleProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounPartOfSpeechType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ParticlePartOfSpeechType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import org.hamcrest.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +40,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,17 +53,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSpringContextTests {
 
+    private static final int FIRST_CHAPTER_NUMBER = 1;
+    private static final int FIRST_VERSE_NUMBER = 1;
+    private static final int FIRST_TOKEN_NUMBER = 1;
+    private static final String DISPLAY_NAME = String.format("%s:%s:%s", FIRST_CHAPTER_NUMBER, FIRST_VERSE_NUMBER, FIRST_TOKEN_NUMBER);
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
     private MockMvc mockMvc;
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
     private int totalNumberOfChapters;
+    private Token token;
 
     @Value("${script.name:SIMPLE_ENHANCED}") private String scriptName;
     @Autowired private WebApplicationContext webApplicationContext;
     @Autowired private DataInitializationTool dataInitializationTool;
     @Autowired private MongoDbFactory mongoDbFactory;
+    @Autowired private TokenRepository tokenRepository;
 
     @BeforeClass
     public void beforeClass() throws Exception {
@@ -64,6 +82,9 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
         totalNumberOfChapters++;
         dataInitializationTool.createChapter(49, script);
         totalNumberOfChapters++;
+
+        token = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(FIRST_CHAPTER_NUMBER, FIRST_VERSE_NUMBER,
+                FIRST_TOKEN_NUMBER);
     }
 
     @AfterSuite
@@ -111,6 +132,52 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
         mockMvc.perform(MockMvcRequestBuilders.get("/morphological/tokens").contentType(contentType).content(json(group)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(29)));
+    }
+
+    @Test(dependsOnMethods = "getAllTokens")
+    public void getToken() throws Exception {
+        final String path = String.format("/morphological/chapter/%s/verse/%s/token/%s", FIRST_CHAPTER_NUMBER, FIRST_VERSE_NUMBER, FIRST_TOKEN_NUMBER);
+        mockMvc.perform(MockMvcRequestBuilders.get(path))
+                .andExpect(content().contentType(contentType))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.displayName", Matchers.equalTo(DISPLAY_NAME)))
+                .andExpect(jsonPath("$.locations", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.locations[0].startIndex", Matchers.equalTo(0)))
+                .andExpect(jsonPath("$.locations[0].endIndex", Matchers.equalTo(3)));
+    }
+
+    @Test(dependsOnMethods = "getToken")
+    public void saveToken() throws Exception {
+        final ArabicWord tokenWord = token.tokenWord();
+
+        final Location location = token.getLocations().get(0);
+        location.setEndIndex(1);
+        ArabicWord arabicWord = ArabicWord.getSubWord(tokenWord, location.getStartIndex(), location.getEndIndex());
+        location.setText(arabicWord.toUnicode());
+        location.setDerivedText(arabicWord.toUnicode());
+        location.setWordType(WordType.PARTICLE);
+        List<AbstractProperties> properties = location.getProperties();
+        final ParticleProperties particleProperties = (ParticleProperties) properties.get(0);
+        particleProperties.setPartOfSpeech(ParticlePartOfSpeechType.GENITIVE_PARTICLE);
+
+        Location newLocation = new Location(location.getChapterNumber(), location.getVerseNumber(), location.getTokenNumber(), 2, WordType.NOUN);
+        newLocation.setStartIndex(1);
+        newLocation.setEndIndex(arabicWord.getLength());
+        arabicWord = ArabicWord.getSubWord(tokenWord, newLocation.getStartIndex(), newLocation.getEndIndex());
+        newLocation.setText(arabicWord.toUnicode());
+        newLocation.setDerivedText(arabicWord.toUnicode());
+        properties = newLocation.getProperties();
+        final NounProperties nounProperties = (NounProperties) properties.get(0);
+        nounProperties.setPartOfSpeech(NounPartOfSpeechType.NOUN);
+        nounProperties.setStatus(NounStatus.GENITIVE);
+
+        token.addLocation(newLocation);
+
+        final String path = String.format("/morphological/chapter/%s/verse/%s/token/%s", FIRST_CHAPTER_NUMBER, FIRST_VERSE_NUMBER, FIRST_TOKEN_NUMBER);
+        mockMvc.perform(MockMvcRequestBuilders.post(path).contentType(contentType).content(json(token)))
+                .andExpect(jsonPath("$.displayName", Matchers.equalTo(DISPLAY_NAME)))
+                .andExpect(jsonPath("$.locations", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.locations[1].displayName", Matchers.equalTo("1:1:1:2")));
     }
 
     @SuppressWarnings("unchecked")
