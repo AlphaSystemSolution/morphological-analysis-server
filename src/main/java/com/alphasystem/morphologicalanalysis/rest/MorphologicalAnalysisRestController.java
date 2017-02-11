@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 /**
  * @author sali
  */
@@ -64,7 +66,7 @@ public class MorphologicalAnalysisRestController {
         return tokenRepository.save(token);
     }
 
-    @RequestMapping(value = "/tokens", method = RequestMethod.GET)
+    @RequestMapping(value = "/tokens", method = RequestMethod.POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     public List<Token> getTokens(@RequestBody VerseTokenPairGroup group) {
         return repositoryUtil.getTokens(group);
     }

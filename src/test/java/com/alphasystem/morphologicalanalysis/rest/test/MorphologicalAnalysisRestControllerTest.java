@@ -129,7 +129,7 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
     public void getAllTokens() throws Exception {
         VerseTokenPairGroup group = new VerseTokenPairGroup();
         group.setChapterNumber(1);
-        mockMvc.perform(MockMvcRequestBuilders.get("/morphological/tokens").contentType(contentType).content(json(group)))
+        mockMvc.perform(MockMvcRequestBuilders.post("/morphological/tokens").contentType(contentType).content(json(group)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(29)));
     }
