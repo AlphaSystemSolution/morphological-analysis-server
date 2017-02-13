@@ -120,7 +120,7 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
         group.getPairs().add(new VerseTokensPair(2));
         group.getPairs().add(new VerseTokensPair(3));
         group.getPairs().add(new VerseTokensPair(4));
-        mockMvc.perform(MockMvcRequestBuilders.get("/morphological/tokens").contentType(contentType).content(json(group)))
+        mockMvc.perform(MockMvcRequestBuilders.post("/morphological/tokens").contentType(contentType).content(json(group)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(13)));
     }
