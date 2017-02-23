@@ -61,7 +61,7 @@ public class MorphologicalAnalysisRestController {
         return tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(chapterNumber, verseNumber, tokenNumber);
     }
 
-    @RequestMapping(value = "/chapter/{chapterNumber}/verse/{verseNumber}/token/{tokenNumber}", method = RequestMethod.POST)
+    @RequestMapping(value = "/saveToken", method = RequestMethod.POST)
     public Token saveToken(@RequestBody Token token) {
         return tokenRepository.save(token);
     }

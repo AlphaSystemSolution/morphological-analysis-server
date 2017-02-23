@@ -173,7 +173,7 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
 
         token.addLocation(newLocation);
 
-        final String path = String.format("/morphological/chapter/%s/verse/%s/token/%s", FIRST_CHAPTER_NUMBER, FIRST_VERSE_NUMBER, FIRST_TOKEN_NUMBER);
+        final String path = "/morphological/saveToken";
         mockMvc.perform(MockMvcRequestBuilders.post(path).contentType(contentType).content(json(token)))
                 .andExpect(jsonPath("$.displayName", Matchers.equalTo(DISPLAY_NAME)))
                 .andExpect(jsonPath("$.locations", Matchers.hasSize(2)))
