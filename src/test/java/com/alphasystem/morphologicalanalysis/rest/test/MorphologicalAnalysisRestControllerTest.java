@@ -196,7 +196,7 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
         morphologicalEntry.initDisplayName();
 
         final String path = "/morphological/morphologicalEntry/create";
-        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(path).contentType(contentType)
+        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put(path).contentType(contentType)
                 .content(json(morphologicalEntry)));
         resultActions.andExpect(jsonPath("$.id", Matchers.equalTo(morphologicalEntry.getId())))
                 .andExpect(jsonPath("$.displayName", Matchers.equalTo(morphologicalEntry.getDisplayName())))
