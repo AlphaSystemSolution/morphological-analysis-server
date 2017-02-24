@@ -1,9 +1,14 @@
 package com.alphasystem.morphologicalanalysis.rest.test;
 
+import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.MorphologicalAnalysisApplication;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.util.DataInitializationTool;
 import com.alphasystem.morphologicalanalysis.util.Script;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
@@ -28,6 +33,7 @@ import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -174,10 +180,42 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
         token.addLocation(newLocation);
 
         final String path = "/morphological/saveToken";
-        mockMvc.perform(MockMvcRequestBuilders.post(path).contentType(contentType).content(json(token)))
-                .andExpect(jsonPath("$.displayName", Matchers.equalTo(DISPLAY_NAME)))
+        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(path).contentType(contentType).content(json(token)));
+        resultActions.andExpect(jsonPath("$.displayName", Matchers.equalTo(DISPLAY_NAME)))
                 .andExpect(jsonPath("$.locations", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.locations[1].displayName", Matchers.equalTo("1:1:1:2")));
+    }
+
+    @Test(dependsOnMethods = "saveToken")
+    public void createMorphologicalEntry() throws Exception {
+        MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
+        morphologicalEntry.setForm(NamedTemplate.FORM_I_CATEGORY_A_GROUP_U_TEMPLATE);
+        morphologicalEntry.setRootLetters(new RootLetters(ArabicLetterType.NOON, ArabicLetterType.SAD, ArabicLetterType.RA));
+        morphologicalEntry.getVerbalNouns().add(VerbalNoun.VERBAL_NOUN_V1);
+        morphologicalEntry.setShortTranslation("To help");
+        morphologicalEntry.initDisplayName();
+
+        final String path = "/morphological/morphologicalEntry/create";
+        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(path).contentType(contentType)
+                .content(json(morphologicalEntry)));
+        resultActions.andExpect(jsonPath("$.id", Matchers.equalTo(morphologicalEntry.getId())))
+                .andExpect(jsonPath("$.displayName", Matchers.equalTo(morphologicalEntry.getDisplayName())))
+                .andExpect(jsonPath("$.rootLetters.displayName", Matchers.equalTo(morphologicalEntry.getRootLetters().getDisplayName())))
+                .andExpect(jsonPath("$.groupTag", Matchers.equalTo(morphologicalEntry.getRootLetters().getDisplayName())));
+    }
+
+    @Test(dependsOnMethods = "createMorphologicalEntry")
+    public void findMorphologicalEntry() throws Exception {
+        final NamedTemplate namedTemplate = NamedTemplate.FORM_I_CATEGORY_A_GROUP_U_TEMPLATE;
+        final RootLetters rootLetters = new RootLetters(ArabicLetterType.NOON, ArabicLetterType.SAD, ArabicLetterType.RA);
+        final String displayName = String.format("%s:%s", namedTemplate.name(), rootLetters.getDisplayName());
+        final String path = "/morphological/morphologicalEntry/find";
+        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get(path).contentType(contentType)
+                .param("displayName", displayName));
+        resultActions.andExpect(jsonPath("$.id", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.displayName", Matchers.equalTo(displayName)))
+                .andExpect(jsonPath("$.groupTag", Matchers.equalTo(rootLetters.getDisplayName())))
+                .andExpect(jsonPath("$.form", Matchers.equalTo(namedTemplate.name())));
     }
 
     @SuppressWarnings("unchecked")

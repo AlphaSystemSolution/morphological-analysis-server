@@ -1,6 +1,8 @@
 package com.alphasystem.morphologicalanalysis.rest;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
+import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -30,6 +33,7 @@ public class MorphologicalAnalysisRestController {
     @Autowired private ChapterRepository chapterRepository;
     @Autowired private VerseRepository verseRepository;
     @Autowired private TokenRepository tokenRepository;
+    @Autowired private MorphologicalEntryRepository morphologicalEntryRepository;
 
     @RequestMapping(value = "/chapters", method = RequestMethod.GET)
     public List<Chapter> findAllChapters() {
@@ -69,6 +73,16 @@ public class MorphologicalAnalysisRestController {
     @RequestMapping(value = "/tokens", method = RequestMethod.POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     public List<Token> getTokens(@RequestBody VerseTokenPairGroup group) {
         return repositoryUtil.getTokens(group);
+    }
+
+    @RequestMapping(value = "/morphologicalEntry/create", method = RequestMethod.POST, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+    public MorphologicalEntry createMorphologicalEntry(@RequestBody MorphologicalEntry morphologicalEntry) {
+        return morphologicalEntryRepository.save(morphologicalEntry);
+    }
+
+    @RequestMapping(value = "/morphologicalEntry/find", method = RequestMethod.GET, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+    public MorphologicalEntry findMorphologicalEntry(@RequestParam String displayName) {
+        return morphologicalEntryRepository.findByDisplayName(displayName);
     }
 
 }
