@@ -63,6 +63,7 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
     private static final int FIRST_VERSE_NUMBER = 1;
     private static final int FIRST_TOKEN_NUMBER = 1;
     private static final String DISPLAY_NAME = String.format("%s:%s:%s", FIRST_CHAPTER_NUMBER, FIRST_VERSE_NUMBER, FIRST_TOKEN_NUMBER);
+    private static final String SAVE_TOKEN_PATH = "/morphological/saveToken";
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
@@ -179,8 +180,7 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
 
         token.addLocation(newLocation);
 
-        final String path = "/morphological/saveToken";
-        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(path).contentType(contentType).content(json(token)));
+        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(SAVE_TOKEN_PATH).contentType(contentType).content(json(token)));
         resultActions.andExpect(jsonPath("$.displayName", Matchers.equalTo(DISPLAY_NAME)))
                 .andExpect(jsonPath("$.locations", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.locations[1].displayName", Matchers.equalTo("1:1:1:2")));
@@ -195,13 +195,20 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
         morphologicalEntry.setShortTranslation("To help");
         morphologicalEntry.initDisplayName();
 
-        final String path = "/morphological/morphologicalEntry/create";
-        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put(path).contentType(contentType)
-                .content(json(morphologicalEntry)));
-        resultActions.andExpect(jsonPath("$.id", Matchers.equalTo(morphologicalEntry.getId())))
-                .andExpect(jsonPath("$.displayName", Matchers.equalTo(morphologicalEntry.getDisplayName())))
-                .andExpect(jsonPath("$.rootLetters.displayName", Matchers.equalTo(morphologicalEntry.getRootLetters().getDisplayName())))
-                .andExpect(jsonPath("$.groupTag", Matchers.equalTo(morphologicalEntry.getRootLetters().getDisplayName())));
+        final Token token = tokenRepository.findByDisplayName(DISPLAY_NAME);
+        Assert.assertNotNull(token);
+
+        final Location location = token.getLocations().get(1);
+        Assert.assertNotNull(location);
+        location.setMorphologicalEntry(morphologicalEntry);
+
+        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(SAVE_TOKEN_PATH).contentType(contentType)
+                .content(json(token)));
+        System.out.println(resultActions.andReturn().getResponse().getContentAsString());
+
+        resultActions.andExpect(jsonPath("$.id", Matchers.equalTo(token.getId())))
+                .andExpect(jsonPath("$.locations[1].morphologicalEntry.displayName",
+                        Matchers.equalTo(morphologicalEntry.getDisplayName())));
     }
 
     @Test(dependsOnMethods = "createMorphologicalEntry")
@@ -216,6 +223,18 @@ public class MorphologicalAnalysisRestControllerTest extends AbstractTestNGSprin
                 .andExpect(jsonPath("$.displayName", Matchers.equalTo(displayName)))
                 .andExpect(jsonPath("$.groupTag", Matchers.equalTo(rootLetters.getDisplayName())))
                 .andExpect(jsonPath("$.form", Matchers.equalTo(namedTemplate.name())));
+    }
+
+    @Test(dependsOnMethods = "findMorphologicalEntry")
+    public void findNonExistentMorphologicalEntry() throws Exception {
+        final NamedTemplate namedTemplate = NamedTemplate.FORM_IV_TEMPLATE;
+        final RootLetters rootLetters = new RootLetters(ArabicLetterType.NOON, ArabicLetterType.SAD, ArabicLetterType.RA);
+        final String displayName = String.format("%s:%s", namedTemplate.name(), rootLetters.getDisplayName());
+        final String path = "/morphological/morphologicalEntry/find";
+        final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get(path).contentType(contentType)
+                .param("displayName", displayName));
+        final String content = resultActions.andReturn().getResponse().getContentAsString();
+        Assert.assertEquals(content, "");
     }
 
     @SuppressWarnings("unchecked")
