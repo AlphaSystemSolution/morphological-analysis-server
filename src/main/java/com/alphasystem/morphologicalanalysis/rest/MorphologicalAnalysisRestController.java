@@ -75,11 +75,6 @@ public class MorphologicalAnalysisRestController {
         return repositoryUtil.getTokens(group);
     }
 
-    @RequestMapping(value = "/morphologicalEntry/create", method = RequestMethod.PUT, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-    public MorphologicalEntry createMorphologicalEntry(@RequestBody MorphologicalEntry morphologicalEntry) {
-        return morphologicalEntryRepository.save(morphologicalEntry);
-    }
-
     @RequestMapping(value = "/morphologicalEntry/find", method = RequestMethod.GET, consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     public MorphologicalEntry findMorphologicalEntry(@RequestParam String displayName) {
         return morphologicalEntryRepository.findByDisplayName(displayName);
