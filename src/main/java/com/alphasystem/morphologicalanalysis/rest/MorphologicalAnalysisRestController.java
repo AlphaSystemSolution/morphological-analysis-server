@@ -65,6 +65,14 @@ public class MorphologicalAnalysisRestController {
         return tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(chapterNumber, verseNumber, tokenNumber);
     }
 
+    @RequestMapping(value = "/chapter/{chapterNumber}/verse/{verseNumber}/token/{tokenNumber}/next",
+            consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)
+    public Token getNextToken(@PathVariable(name = "chapterNumber") int chapterNumber,
+                              @PathVariable(name = "verseNumber") int verseNumber,
+                              @PathVariable(name = "tokenNumber") int tokenNumber) {
+        return repositoryUtil.getNextToken(new Token(chapterNumber, verseNumber, tokenNumber, ""));
+    }
+
     @RequestMapping(value = "/saveToken", method = RequestMethod.POST)
     public Token saveToken(@RequestBody Token token) {
         return tokenRepository.save(token);
