@@ -62,7 +62,6 @@
     <logger name="org.apache.tomcat.util" level="INFO"/>
     <logger name="org.springframework.web.servlet.handler" level="INFO"/>
     <logger name="org.apache.catalina.loader" level="INFO"/>
-    <logger name="org.apache.catalina.loader" level="INFO"/>
     <logger name="org.springframework.web.context.support" level="INFO"/>
     <logger name="org.springframework.boot.autoconfigure.logging" level="INFO"/>
     <logger name="org.mongodb.driver.protocol.command" level="INFO"/>
